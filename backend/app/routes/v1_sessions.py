@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from bson import ObjectId
 from mongoengine import get_connection
 
 from flask import Blueprint, request, jsonify, current_app
@@ -11,6 +12,28 @@ from app import log_query_performance
 
 v1_sessions_bp = Blueprint("v1_sessions", __name__)
 logger = logging.getLogger(__name__)
+
+
+def serialize_document(doc):
+    """Convert MongoDB document to JSON-serializable format"""
+    if doc is None:
+        return None
+
+    if isinstance(doc, dict):
+        return {
+            k: (str(v) if isinstance(v, ObjectId) else
+                v.isoformat() if isinstance(v, datetime) else
+                serialize_document(v) if isinstance(v, (dict, list)) else
+                v)
+            for k, v in doc.items()
+        }
+    elif isinstance(doc, list):
+        return [serialize_document(item) for item in doc]
+    elif isinstance(doc, ObjectId):
+        return str(doc)
+    elif isinstance(doc, datetime):
+        return doc.isoformat()
+    return doc
 
 
 @v1_sessions_bp.route("", methods=["GET"])
@@ -111,8 +134,11 @@ def list_sessions():
         count_result = list(db.sessions.aggregate(count_pipeline))
         total = count_result[0]['total'] if count_result else 0
 
+        # CRITICAL: Serialize before returning
+        serialized_sessions = [serialize_document(s) for s in sessions]
+
         return jsonify({
-            'data': sessions,
+            'data': serialized_sessions,
             'total': total,
             'offset': offset,
             'limit': limit
@@ -177,9 +203,10 @@ def get_session_detail(session_id):
         count_result = list(db.events.aggregate(count_pipeline))
         total_events = count_result[0]['total'] if count_result else 0
 
+        # CRITICAL: Serialize before returning
         return jsonify({
-            "session": session,
-            "events": events,
+            "session": serialize_document(session),
+            "events": [serialize_document(e) for e in events],
             "total_events": total_events,
             "offset": offset,
             "limit": limit,

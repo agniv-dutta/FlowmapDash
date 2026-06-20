@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: flowmapdash-api
+    env: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://your-frontend-domain.com
+      - key: GUNICORN_WORKERS
+        value: "2"
+      - key: MONGO_POOL_SIZE
+        value: "10"
+      - key: MONGO_DB_NAME
+        value: flowmapdash
+    healthCheckPath: /health

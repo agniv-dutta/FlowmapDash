@@ -172,12 +172,14 @@ def create_app(config_class=Config):
     from app.routes.v1_sessions import v1_sessions_bp
     from app.routes.v1_heatmap import v1_heatmap_bp
     from app.routes.v1_analytics import v1_analytics_bp
+    from app.routes.v1_notifications import v1_notifications_bp
     from app.routes.auth import auth_bp
 
     app.register_blueprint(v1_events_bp, url_prefix="/api/v1/events")
     app.register_blueprint(v1_sessions_bp, url_prefix="/api/v1/sessions")
     app.register_blueprint(v1_heatmap_bp, url_prefix="/api/v1/heatmap")
     app.register_blueprint(v1_analytics_bp, url_prefix="/api/v1/analytics")
+    app.register_blueprint(v1_notifications_bp, url_prefix="/api/v1/notifications")
     app.register_blueprint(auth_bp)
 
     # ── health / readiness ──────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { ArrowUpRight, Zap, BarChart2 } from 'lucide-react';
+import { ArrowUpRight, Zap, BarChart2, Check } from 'lucide-react';
 import { Card, CardContent } from '../components/Card';
 import EventsChart from '../components/EventsChart';
 
@@ -49,7 +49,7 @@ export function Dashboard() {
               <p className="text-sm font-medium text-neutral-600 mb-2">Avg Events/Session</p>
               <h2 className="text-4xl font-bold text-neutral-900 mb-4">10.0</h2>
               <div className="flex items-center text-neutral-600 text-sm">
-                <span className="flex items-center justify-center h-4 w-4 rounded-full border border-neutral-600 mr-1 text-[10px]">✓</span>
+                <span className="flex items-center justify-center h-4 w-4 rounded-full border border-neutral-600 mr-1"><Check size={10} /></span>
                 <span>Optimal performance stable</span>
               </div>
             </div>

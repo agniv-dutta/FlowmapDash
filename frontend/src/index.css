@@ -7,3 +7,28 @@
     @apply bg-neutral-50 text-neutral-900;
   }
 }
+
+@layer components {
+  button, a, input, select, textarea {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-neutral-950;
+  }
+
+  .card-hover:hover {
+    @apply shadow-elevated -translate-y-1;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+
+  .shimmer {
+    @apply bg-neutral-700 bg-gradient-to-r from-neutral-700 via-neutral-600 to-neutral-700;
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+  }
+}
