@@ -27,7 +27,7 @@ interface User {
 export function useAuth() {
   const login = useMutation({
     mutationFn: (credentials: LoginCredentials) =>
-      apiClient.post<AuthResponse>('/api/v1/auth/login', credentials),
+      apiClient.post<AuthResponse>('/v1/auth/login', credentials),
     onSuccess: (data) => {
       const authData = data.data as AuthResponse;
       localStorage.setItem('token', authData.token);
@@ -39,7 +39,7 @@ export function useAuth() {
 
   const signup = useMutation({
     mutationFn: (credentials: SignupCredentials) =>
-      apiClient.post<{ message: string }>('/api/v1/auth/signup', credentials),
+      apiClient.post<{ message: string }>('/v1/auth/signup', credentials),
   });
 
   const logout = () => {
@@ -75,7 +75,7 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await apiClient.get<User>('/api/v1/auth/me');
+      const response = await apiClient.get<User>('/v1/auth/me');
       return response.data;
     },
     enabled: !!localStorage.getItem('token'),

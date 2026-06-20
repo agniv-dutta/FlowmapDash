@@ -7,7 +7,6 @@ from mongoengine import (
     DateTimeField,
     DictField,
     IntField,
-    IndexModel,
 )
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
@@ -196,10 +195,10 @@ class Session(Document):
     meta = {
         "collection": "sessions",
         "indexes": [
-            IndexModel("session_id", unique=True),
-            IndexModel("last_activity", background=True),
-            IndexModel("created_at", background=True),
-            IndexModel("event_count", background=True),
+            "session_id",
+            "last_activity",
+            "created_at",
+            "event_count",
         ],
         "ordering": ["-last_activity"],
     }
@@ -232,13 +231,13 @@ class Event(Document):
     meta = {
         "collection": "events",
         "indexes": [
-            IndexModel("event_id", unique=True),
-            IndexModel("session_id", background=True),
-            IndexModel([("session_id", 1), ("timestamp", -1)], background=True),
-            IndexModel("event_type", background=True),
-            IndexModel([("timestamp", -1)], background=True),
-            IndexModel([("event_type", 1), ("timestamp", -1)], background=True),
-            IndexModel([("page_url", 1), ("event_type", 1)], background=True),
+            "event_id",
+            "session_id",
+            [("session_id", 1), ("timestamp", -1)],
+            "event_type",
+            [("timestamp", -1)],
+            [("event_type", 1), ("timestamp", -1)],
+            [("page_url", 1), ("event_type", 1)],
         ],
         "ordering": ["-timestamp"],
     }

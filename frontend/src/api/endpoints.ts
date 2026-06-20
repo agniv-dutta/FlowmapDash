@@ -1,7 +1,7 @@
 export const ENDPOINTS = {
-  SESSIONS: '/sessions',
-  SESSION_DETAIL: (id: string) => `/sessions/${id}`,
-  EVENTS: (sessionId: string) => `/sessions/${sessionId}/events`,
-  HEATMAP: '/heatmap',
-  ANALYTICS: '/analytics/summary',
+  SESSIONS: '/v1/sessions',
+  SESSION_DETAIL: (id: string) => `/v1/sessions/${id}`,
+  EVENTS: (sessionId: string) => `/v1/sessions/${sessionId}/events`,
+  HEATMAP: '/v1/heatmap',
+  ANALYTICS: '/v1/analytics/summary',
 };

@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from mongoengine import get_connection
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 
 from app.models import EventCreate, BatchEventCreate
 from app.services.event_service import EventService
@@ -61,7 +61,7 @@ def list_events():
 
     try:
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         
         # Build aggregation pipeline
         pipeline = []

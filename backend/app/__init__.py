@@ -79,11 +79,11 @@ def log_query_performance(func):
     return wrapper
 
 
-def create_indexes():
+def create_indexes(db_name="flowmapdash"):
     """Create MongoDB indexes for optimal query performance"""
     try:
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[db_name]
         
         # Sessions collection indexes
         db.sessions.create_index([('sessionId', 1)], unique=True, sparse=True)
@@ -120,6 +120,7 @@ def create_app(config_class=Config):
     if redis_url:
         try:
             redis_client = Redis.from_url(redis_url)
+            redis_client.ping()
             app.logger.info("Connected to Redis")
         except Exception as e:
             app.logger.warning(f"Failed to connect to Redis: {e}")
@@ -140,7 +141,7 @@ def create_app(config_class=Config):
     limiter.init_app(app)
 
     _init_db(app)
-    create_indexes()  # Create MongoDB indexes
+    create_indexes(app.config.get("MONGO_DB_NAME", "flowmapdash"))  # Create MongoDB indexes
     register_error_handlers(app)
     register_middleware(app)
     

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 import jwt
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from mongoengine import get_connection
 
@@ -27,7 +27,7 @@ def signup():
             return jsonify({'error': 'Password must be at least 8 characters'}), 400
         
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         
         # Check if user exists
         if db.users.find_one({'email': email}):
@@ -63,7 +63,7 @@ def login():
             return jsonify({'error': 'Email and password required'}), 400
         
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         user = db.users.find_one({'email': email})
         
         if not user or not check_password_hash(user['password'], password):
@@ -111,7 +111,7 @@ def get_current_user():
         )
         
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         user = db.users.find_one({'email': decoded['email']}, {'password': 0})
         
         if not user:

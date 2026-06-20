@@ -1,8 +1,8 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from mongoengine import get_connection
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 
 from app.services.session_service import SessionService
 from app.services.event_service import EventService
@@ -84,7 +84,7 @@ def list_sessions():
 
     try:
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         sessions = list(db.sessions.aggregate(pipeline))
         
         # Get total count
@@ -133,7 +133,7 @@ def get_session_detail(session_id):
 
     try:
         conn = get_connection()
-        db = conn[conn.get_database().name]
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
         
         # Get session with aggregation
         pipeline = [
@@ -187,3 +187,63 @@ def get_session_detail(session_id):
     except Exception:
         logger.exception("Failed to fetch session detail with aggregation")
         raise
+
+
+@v1_sessions_bp.route("/seed", methods=["POST"])
+def seed_sessions():
+    """Create sample data for testing"""
+    try:
+        conn = get_connection()
+        db = conn[current_app.config.get("MONGO_DB_NAME", "flowmapdash")]
+        
+        # Clear existing data (dev only)
+        db.sessions.delete_many({})
+        db.events.delete_many({})
+        
+        # Create 5 sample sessions
+        sessions = []
+        for i in range(1, 6):
+            session_id = f'sess_demo_{str(i).zfill(3)}'
+            sessions.append({
+                'session_id': session_id,
+                'created_at': datetime.now() - timedelta(hours=i),
+                'last_activity': datetime.now() - timedelta(hours=i-1),
+                'metadata': {'status': 'active' if i <= 2 else 'inactive'},
+                'event_count': 0
+            })
+        
+        db.sessions.insert_many(sessions)
+        
+        # Create sample events for each session
+        events = []
+        for session in sessions:
+            for j in range(5, 15):
+                events.append({
+                    'event_id': f'evt_{session["session_id"]}_{j}',
+                    'session_id': session['session_id'],
+                    'event_type': 'page_view' if j % 2 == 0 else 'click',
+                    'page_url': f'https://example.com/page/{j}',
+                    'timestamp': datetime.now() - timedelta(minutes=j),
+                    'coordinates': {'x': 100 + j*10, 'y': 200 + j*5} if j % 2 else None,
+                    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'metadata': {}
+                })
+        
+        db.events.insert_many(events)
+        
+        # Update session event counts
+        for session in sessions:
+            event_count = db.events.count_documents({'session_id': session['session_id']})
+            db.sessions.update_one(
+                {'session_id': session['session_id']},
+                {'$set': {'event_count': event_count}}
+            )
+        
+        return jsonify({
+            'message': 'Sample data created',
+            'sessions': len(sessions),
+            'events': len(events)
+        }), 201
+    except Exception as e:
+        logger.exception("Failed to seed sample data")
+        return jsonify({'error': str(e)}), 500

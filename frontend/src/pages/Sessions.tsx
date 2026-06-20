@@ -5,92 +5,76 @@ import { apiClient } from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 
 interface Session {
-  id: string;
-  userId: string;
-  startTime: string;
-  endTime: string;
-  eventCount: number;
-  duration: number;
-  device: string;
-  browser: string;
+  session_id: string;
+  created_at: string;
+  last_activity: string;
+  event_count: number;
+  metadata?: any;
 }
 
 const columns: ColumnDef<Session>[] = [
   {
     header: 'Session ID',
-    accessorKey: 'id',
+    accessorKey: 'session_id',
   },
   {
-    header: 'User ID',
-    accessorKey: 'userId',
+    header: 'Created At',
+    accessorKey: 'created_at',
   },
   {
-    header: 'Start Time',
-    accessorKey: 'startTime',
-  },
-  {
-    header: 'End Time',
-    accessorKey: 'endTime',
+    header: 'Last Activity',
+    accessorKey: 'last_activity',
   },
   {
     header: 'Events',
-    accessorKey: 'eventCount',
+    accessorKey: 'event_count',
   },
   {
-    header: 'Duration (s)',
-    accessorKey: 'duration',
-  },
-  {
-    header: 'Device',
-    accessorKey: 'device',
-  },
-  {
-    header: 'Browser',
-    accessorKey: 'browser',
+    header: 'Status',
+    accessorKey: 'metadata.status',
   },
 ];
 
 export function Sessions() {
-  const { data, isLoading } = useQuery({
+  console.log('Sessions page rendering');
+  
+  const { data, isLoading, error } = useQuery({
     queryKey: ['sessions'],
     queryFn: async () => {
-      const response = await apiClient.get(ENDPOINTS.SESSIONS);
-      return response.data;
+      console.log('Making API request to:', ENDPOINTS.SESSIONS);
+      try {
+        const response = await apiClient.get(ENDPOINTS.SESSIONS);
+        console.log('API response received:', response.data);
+        return response.data;
+      } catch (err) {
+        console.error('API call failed:', err);
+        throw err;
+      }
     },
   });
 
-  const sessions = data || [
-    {
-      id: 'sess_001',
-      userId: 'user_123',
-      startTime: '2024-01-15 10:30:00',
-      endTime: '2024-01-15 11:45:00',
-      eventCount: 245,
-      duration: 4500,
-      device: 'Desktop',
-      browser: 'Chrome',
-    },
-    {
-      id: 'sess_002',
-      userId: 'user_456',
-      startTime: '2024-01-15 12:00:00',
-      endTime: '2024-01-15 12:30:00',
-      eventCount: 89,
-      duration: 1800,
-      device: 'Mobile',
-      browser: 'Safari',
-    },
-    {
-      id: 'sess_003',
-      userId: 'user_789',
-      startTime: '2024-01-15 14:15:00',
-      endTime: '2024-01-15 15:00:00',
-      eventCount: 312,
-      duration: 2700,
-      device: 'Desktop',
-      browser: 'Firefox',
-    },
-  ];
+  console.log('Sessions page state:', { data, isLoading, error });
+
+  if (isLoading) {
+    return <div className="p-8">Loading sessions...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-red-500">Error: {(error as Error).message}</div>;
+  }
+
+  const sessions = data?.data || [];
+
+  if (sessions.length === 0) {
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-neutral-900 mb-1">Sessions</h1>
+        <p className="text-neutral-600 mb-4">View and manage user sessions</p>
+        <p className="text-gray-600 mb-4">No data found</p>
+        <a href="/api-test" className="text-blue-500 underline">Test API Connection</a>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +87,7 @@ export function Sessions() {
         columns={columns}
         data={sessions}
         isLoading={isLoading}
-        onRowClick={(session) => console.log('Clicked session:', session.id)}
+        onRowClick={(session) => console.log('Clicked session:', session.session_id)}
       />
     </div>
   );

@@ -33,14 +33,14 @@ export function HeatmapCanvas({ clickData, width = 800, height = 600 }: HeatmapC
     avgClicksPerArea: Math.round(clickData.reduce((sum, c) => sum + c.count, 0) / clickData.length) || 0,
   };
 
-  function getHeatColor(clickCount: number, maxClicks: number): string {
+  function getHeatColor(clickCount: number, maxClicks: number): { fill: string; stroke: string } {
     const intensity = clickCount / maxClicks;
     
-    // Gradient from light to dark teal
-    if (intensity < 0.25) return 'rgba(74, 124, 126, 0.3)'; // Light teal
-    if (intensity < 0.5) return 'rgba(74, 124, 126, 0.6)';
-    if (intensity < 0.75) return 'rgba(74, 124, 126, 0.8)';
-    return 'rgba(74, 124, 126, 1)'; // Full teal
+    // Saturated teal gradient with high contrast
+    if (intensity < 0.25) return { fill: 'rgba(100, 200, 200, 0.5)', stroke: 'rgba(30, 100, 100, 0.8)' };
+    if (intensity < 0.5) return { fill: 'rgba(74, 180, 180, 0.7)', stroke: 'rgba(30, 100, 100, 0.9)' };
+    if (intensity < 0.75) return { fill: 'rgba(42, 150, 150, 0.9)', stroke: 'rgba(20, 80, 80, 1)' };
+    return { fill: 'rgba(30, 120, 120, 1)', stroke: 'rgba(10, 60, 60, 1)' };
   }
 
   const drawCanvas = () => {
@@ -58,11 +58,11 @@ export function HeatmapCanvas({ clickData, width = 800, height = 600 }: HeatmapC
     ctx.translate(panX, panY);
     ctx.scale(scale, scale);
 
-    // Draw background
-    ctx.fillStyle = '#FAFBF9';
+    // Bright white background
+    ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
 
-    // Draw grid
+    // Draw subtle grid
     ctx.strokeStyle = '#E8E4E0';
     ctx.lineWidth = 1;
     const gridSize = 50;
@@ -81,13 +81,16 @@ export function HeatmapCanvas({ clickData, width = 800, height = 600 }: HeatmapC
       ctx.stroke();
     }
 
-    // Draw click dots with heat gradient
+    // Draw click dots with saturated colors and borders
     clickData.forEach(({ x, y, count }) => {
-      const color = getHeatColor(count, maxClickCount);
-      ctx.fillStyle = color;
+      const { fill, stroke } = getHeatColor(count, maxClickCount);
+      ctx.fillStyle = fill;
       ctx.beginPath();
       ctx.arc(x, y, 8, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     });
 
     ctx.restore();
