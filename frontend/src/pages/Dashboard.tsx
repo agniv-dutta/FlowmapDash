@@ -1,5 +1,6 @@
 import { ArrowUpRight, Zap, BarChart2 } from 'lucide-react';
 import { Card, CardContent } from '../components/Card';
+import EventsChart from '../components/EventsChart';
 
 export function Dashboard() {
   return (
@@ -59,32 +60,8 @@ export function Dashboard() {
         </Card>
       </div>
       
-      {/* Chart mock */}
-      <Card>
-        <CardContent>
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-neutral-900">Events Over Time</h3>
-              <p className="text-sm text-neutral-600">Daily event volume for the last 7 days</p>
-            </div>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 bg-neutral-200 text-neutral-900 text-sm rounded">7 Days</button>
-              <button className="px-3 py-1 text-neutral-600 hover:text-neutral-900 text-sm rounded">30 Days</button>
-            </div>
-          </div>
-          <div className="h-64 flex items-end justify-between px-2 gap-4">
-             {/* Chart bars mock */}
-             {[1, 1.2, 0.8, 1.5, 1.1, 0.5, 2].map((v, i) => (
-                <div key={i} className="w-full bg-primary-700/50 rounded-t-lg relative flex items-end justify-center group hover:bg-primary-600/50 transition-colors" style={{ height: `${v * 40}%` }}>
-                  <span className="absolute -bottom-6 text-xs text-neutral-600">
-                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'][i]}
-                  </span>
-                </div>
-             ))}
-          </div>
-          <div className="h-6"></div>
-        </CardContent>
-      </Card>
+      {/* Events Chart */}
+      <EventsChart />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import os
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "change-me-in-production")
+    JWT_SECRET = os.environ.get("JWT_SECRET", os.environ.get("SECRET_KEY", "change-me-in-production"))
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     VERSION = os.environ.get("APP_VERSION", "1.0.0")
 
@@ -14,6 +15,9 @@ class Config:
 
     RATELIMIT_CAPACITY = int(os.environ.get("RATELIMIT_CAPACITY", "200"))
     RATELIMIT_REFILL_RATE = float(os.environ.get("RATELIMIT_REFILL_RATE", "20.0"))
+
+    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    RATELIMIT_STORAGE_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
     DEBUG = os.environ.get("FLASK_DEBUG", "0") == "1"
 
