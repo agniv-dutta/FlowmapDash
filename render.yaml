@@ -1,6 +1,7 @@
 services:
   - type: web
     name: flowmapdash-api
+    env: docker
     region: oregon
     plan: starter
     dockerfilePath: ./backend/Dockerfile
