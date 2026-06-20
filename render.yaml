@@ -1,7 +1,6 @@
 services:
   - type: web
     name: flowmapdash-api
-    env: docker
     region: oregon
     plan: starter
     dockerfilePath: ./backend/Dockerfile
@@ -11,6 +10,8 @@ services:
       - key: MONGO_URI
         sync: false
       - key: SECRET_KEY
+        sync: false
+      - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
         value: https://your-frontend-domain.com
