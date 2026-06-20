@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Moon, Lock, Key, Download, Trash2, Mail, Shield } from 'lucide-react';
+import { Moon, Lock, Key, Download, Trash2, Mail, Shield } from 'lucide-react';
 
 export function Settings() {
   const [settings, setSettings] = useState({
